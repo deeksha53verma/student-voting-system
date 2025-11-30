@@ -15,6 +15,7 @@
 <main class="container">
     <section class="card">
         <h2>Live Election Results</h2>
+        <p id="winnerAnnouncement" class="status-label">Winner: —</p>
         <p class="subtitle">Vote counts are fetched from the smart contract.</p>
 
         <div class="results-grid">
@@ -48,13 +49,17 @@
 
         </div>
 
+        <canvas id="resultsChart" style="margin-top:16px;"></canvas>
+
         <div class="actions">
             <a href="/dashboard" class="link-btn">Back</a>
+            <a id="downloadCsvBtn" class="link-btn" href="#">Download CSV</a>
         </div>
     </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="{{ url_for('static', filename='jss/blockchainConfig.js') }}"></script>
 <script src="{{ url_for('static', filename='jss/results.js') }}"></script>
 

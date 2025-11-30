@@ -40,12 +40,16 @@ def results():
 # --- LocalChain (gasless) ---
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 DATA_FILE = os.path.join(DATA_DIR, 'localchain.json')
+ELECTION_FILE = os.path.join(DATA_DIR, 'election.json')
 
 def _ensure_store():
     os.makedirs(DATA_DIR, exist_ok=True)
     if not os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'w', encoding='utf-8') as f:
             json.dump({"votes": {"1": 0, "2": 0, "3": 0}, "hasVoted": {}}, f)
+    if not os.path.exists(ELECTION_FILE):
+        with open(ELECTION_FILE, 'w', encoding='utf-8') as f:
+            json.dump({"endTs": 0}, f)
 
 def _load_state():
     _ensure_store()
@@ -63,6 +67,20 @@ def _save_state(votes, has_voted):
     data = {"votes": {"1": votes[1], "2": votes[2], "3": votes[3]}, "hasVoted": has_voted}
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f)
+
+def _load_election():
+    _ensure_store()
+    try:
+        with open(ELECTION_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return int(data.get('endTs', 0))
+    except Exception:
+        return 0
+
+def _save_election(end_ts):
+    _ensure_store()
+    with open(ELECTION_FILE, 'w', encoding='utf-8') as f:
+        json.dump({"endTs": int(end_ts)}, f)
 
 local_votes, local_has_voted = _load_state()
 
@@ -91,6 +109,34 @@ def api_local_results():
 def api_local_has_voted():
     wallet = (request.args.get('wallet') or '').lower()
     return jsonify({"hasVoted": bool(local_has_voted.get(wallet))})
+
+@app.get('/api/local/election')
+def api_local_election():
+    return jsonify({"endTs": _load_election()})
+
+@app.post('/api/local/setEndTs')
+def api_local_set_end():
+    data = request.get_json(force=True)
+    end_ts = int(data.get('endTs', 0))
+    _save_election(end_ts)
+    return jsonify({"success": True})
+
+@app.post('/api/local/reset')
+def api_local_reset():
+    global local_votes, local_has_voted
+    local_votes = {1: 0, 2: 0, 3: 0}
+    local_has_voted = {}
+    _save_state(local_votes, local_has_voted)
+    return jsonify({"success": True})
+
+@app.get('/api/local/export.csv')
+def api_local_export_csv():
+    rows = ["candidateId,votes",
+            f"1,{local_votes[1]}",
+            f"2,{local_votes[2]}",
+            f"3,{local_votes[3]}"
+            ]
+    return ("\n".join(rows), 200, {"Content-Type": "text/csv"})
 
 
 if __name__ == "__main__":

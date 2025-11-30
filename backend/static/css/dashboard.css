@@ -85,6 +85,12 @@ body {
 .feature-icon { font-size: 1.4rem; }
 .feature-text { margin-top: 6px; font-weight: 600; }
 
+.admin-tools { margin-top: 28px; }
+.admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.admin-card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+.admin-label { display: block; margin-bottom: 6px; color: #334155; font-weight: 600; }
+.admin-input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #e5e7eb; }
+
 @media (max-width: 900px) {
     .actions-grid, .steps, .features { grid-template-columns: repeat(2, 1fr); }
 }

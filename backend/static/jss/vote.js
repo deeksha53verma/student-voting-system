@@ -15,6 +15,9 @@ const txHashLink = document.getElementById("txHashLink");
 const contractInput = document.getElementById("contractAddressInput");
 const saveContractBtn = document.getElementById("saveContractAddressBtn");
 const openRemixBtn = document.getElementById("openRemixBtn");
+const voteChartEl = document.getElementById("voteChart");
+const voteWinnerEl = document.getElementById("voteWinner");
+let voteChart = null;
 
 let provider = null;
 let signer = null;
@@ -309,6 +312,60 @@ submitVoteBtn.addEventListener("click", async () => {
         showStatus(err.reason || err.message || "Failed to cast vote.", "error");
     }
 });
+
+// --------- Live chart and winner ----------
+async function fetchCounts() {
+    try {
+        if (!window.CONTRACT_ADDRESS || window.CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+            const res = await fetch('/api/local/results');
+            const data = await res.json();
+            return [Number(data["1"]), Number(data["2"]), Number(data["3"])];
+        }
+        const rpc = (window.DEFAULT_CHAIN && window.DEFAULT_CHAIN.rpcUrls && window.DEFAULT_CHAIN.rpcUrls[0]) || undefined;
+        const provider = rpc ? new ethers.JsonRpcProvider(rpc) : new ethers.JsonRpcProvider();
+        const readContract = new ethers.Contract(window.CONTRACT_ADDRESS, window.CONTRACT_ABI, provider);
+        const [v1, v2, v3] = await Promise.all([
+            readContract.getVotes(1), readContract.getVotes(2), readContract.getVotes(3)
+        ]);
+        return [Number(v1), Number(v2), Number(v3)];
+    } catch {
+        return [0, 0, 0];
+    }
+}
+
+function announceWinner(v1, v2, v3) {
+    const arr = [v1, v2, v3];
+    const max = Math.max(...arr);
+    const winners = [];
+    if (v1 === max) winners.push("Candidate One");
+    if (v2 === max) winners.push("Candidate Two");
+    if (v3 === max) winners.push("Candidate Three");
+    if (winners.length === 0) {
+        voteWinnerEl.textContent = "Leading: —";
+    } else if (winners.length === 1) {
+        voteWinnerEl.textContent = `Leading: ${winners[0]} (${max} votes)`;
+    } else {
+        voteWinnerEl.textContent = `Tie: ${winners.join(" vs ")} (${max} votes)`;
+    }
+}
+
+async function renderVoteChart() {
+    const [v1, v2, v3] = await fetchCounts();
+    announceWinner(v1, v2, v3);
+    const data = {
+        labels: ["Candidate One", "Candidate Two", "Candidate Three"],
+        datasets: [{ label: "Votes", data: [v1, v2, v3], backgroundColor: ["#4f46e5", "#22c55e", "#f97316"] }]
+    };
+    if (!voteChart && voteChartEl && window.Chart) {
+        voteChart = new Chart(voteChartEl, { type: 'bar', data, options: { responsive: true, scales: { y: { beginAtZero: true } } } });
+    } else if (voteChart) {
+        voteChart.data = data;
+        voteChart.update();
+    }
+}
+
+renderVoteChart();
+setInterval(renderVoteChart, 5000);
 
 // --------- MetaMask event listeners ----------
 if (window.ethereum) {

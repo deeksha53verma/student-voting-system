@@ -28,12 +28,16 @@ connectBtn.addEventListener('click', () => {
   connect().catch(() => { statusPill.textContent = 'Failed to connect'; });
 });
 
-function startCountdown() {
+async function startCountdown() {
   const now = Date.now();
+  let serverEnd = 0;
+  try {
+    const r = await fetch('/api/local/election');
+    const d = await r.json();
+    serverEnd = Number(d.endTs || 0);
+  } catch {}
   const defaultEnd = now + 2 * 24 * 60 * 60 * 1000 + 14 * 60 * 60 * 1000 + 32 * 60 * 1000;
-  const saved = Number(localStorage.getItem('electionEndTs') || 0);
-  const endTs = saved && saved > now ? saved : defaultEnd;
-  if (!saved) localStorage.setItem('electionEndTs', String(endTs));
+  const endTs = serverEnd && serverEnd > now ? serverEnd : defaultEnd;
   function tick() {
     const diff = Math.max(0, endTs - Date.now());
     const d = Math.floor(diff / (24*60*60*1000));
@@ -53,3 +57,4 @@ if (window.ethereum) {
   window.ethereum.on('chainChanged', () => location.reload());
 }
 
+// Admin tools removed from UI

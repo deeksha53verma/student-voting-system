@@ -99,6 +99,11 @@
                 <button type="button" id="saveContractAddressBtn" class="secondary-btn" style="margin-top:8px;">Save & Reload</button>
                 <button type="button" id="openRemixBtn" class="secondary-btn" style="margin-top:8px;">Open Remix to Deploy</button>
             </div>
+            <div class="info-card">
+                <h3>Live Tally</h3>
+                <p id="voteWinner" class="status-label">Leading: —</p>
+                <canvas id="voteChart" style="margin-top:8px;"></canvas>
+            </div>
         </div>
     </section>
 
@@ -117,6 +122,7 @@
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="{{ url_for('static', filename='jss/blockchainConfig.js') }}"></script>
 <script src="{{ url_for('static', filename='jss/vote.js') }}"></script>
 
