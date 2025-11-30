@@ -6,15 +6,17 @@ window.addEventListener("DOMContentLoaded", async () => {
     const c2El = document.getElementById("cand2Votes");
     const c3El = document.getElementById("cand3Votes");
 
-    if (!window.ethereum) {
-        c1El.textContent = "?";
-        c2El.textContent = "?";
-        c3El.textContent = "?";
-        return;
-    }
-
     try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        if (!window.CONTRACT_ADDRESS || window.CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+            const res = await fetch('/api/local/results');
+            const data = await res.json();
+            c1El.textContent = String(data["1"]);
+            c2El.textContent = String(data["2"]);
+            c3El.textContent = String(data["3"]);
+            return;
+        }
+        const rpc = (window.DEFAULT_CHAIN && window.DEFAULT_CHAIN.rpcUrls && window.DEFAULT_CHAIN.rpcUrls[0]) || undefined;
+        const provider = rpc ? new ethers.JsonRpcProvider(rpc) : new ethers.JsonRpcProvider();
         const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
         const [v1, v2, v3] = await Promise.all([

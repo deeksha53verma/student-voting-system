@@ -1,0 +1,15 @@
+# Python/Flask
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# LocalChain persisted data
+backend/data/
+
+# Node vendored libs (if any)
+node_modules/
+
+# IDE
+.vscode/
+.idea/

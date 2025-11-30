@@ -1,9 +1,21 @@
 // backend/static/js/blockchainConfig.js
 
-// 🔴 TEMP ADDRESS – change this later to your real deployed contract
-// Example: "0x1234abcd..."
-// For now keep this dummy address so app can run.
-const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+// Contract address. Can be overridden via localStorage key 'contractAddressOverride'.
+let CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+const override = (typeof window !== 'undefined') ? window.localStorage.getItem('contractAddressOverride') : null;
+if (override && /^0x[a-fA-F0-9]{40}$/.test(override)) {
+  CONTRACT_ADDRESS = override;
+}
+
+// Default chain config (Sepolia). Used for optional chain switching.
+window.DEFAULT_CHAIN = {
+  chainIdHex: "0xAA36A7", // 11155111
+  chainIdDec: 11155111,
+  chainName: "Sepolia Test Network",
+  nativeCurrency: { name: "Sepolia Ether", symbol: "SEP", decimals: 18 },
+  rpcUrls: ["https://rpc.sepolia.org"],
+  blockExplorerUrls: ["https://sepolia.etherscan.io"],
+};
 
 // ✅ ABI of your Election.sol contract
 // contract Election {

@@ -2,38 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Student Election — Dashboard</title>
+    <title>Student Council Election 2025 — Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
 <body>
 
-    <div class="navbar">
-        Student Election — Dashboard
-    </div>
+    <header class="navbar">
+        <div class="nav-left">
+            <span class="brand-pill">Blockchain-Secured Voting</span>
+            <h1 class="headline">StudentChain Vote</h1>
+            <p class="subhead">Secure, transparent elections powered by smart contracts</p>
+        </div>
+        <div class="nav-right">
+            <button id="connectDashboardWalletBtn" class="primary-btn">Connect Wallet with MetaMask</button>
+            <span id="dashboardWalletStatus" class="wallet-pill">Not connected</span>
+        </div>
+    </header>
 
     <main class="container">
-        <div class="welcome-card">
-            <h2>Blockchain-based Voting</h2>
-            <p>
-                This student election system uses Ethereum/Polygon smart contracts.
-                Votes are recorded on-chain, not in any local database.
-            </p>
-        </div>
+        <section class="top-options">
+            <div class="top-grid">
+                <a href="/vote" class="top-card"><div class="top-icon">🔗</div><div class="top-text">Connect Wallet</div></a>
+                <a href="/vote" class="top-card"><div class="top-icon">✅</div><div class="top-text">Verify Identity</div></a>
+                <a href="/vote" class="top-card"><div class="top-icon">🗳️</div><div class="top-text">Cast Your Vote</div></a>
+                <a href="/results" class="top-card"><div class="top-icon">📊</div><div class="top-text">View Results</div></a>
+            </div>
+        </section>
+        <section class="election-card">
+            <div class="card-header">
+                <span class="live-badge">Live</span>
+                <h2>Student Council Election 2025</h2>
+            </div>
+            <div class="time-remaining">
+                <span class="label">Time Remaining</span>
+                <span id="timeRemaining" class="time-value">—</span>
+            </div>
+            <div class="rules">
+                <span class="rules-title">Voting Rules:</span>
+                <ul class="rules-list">
+                    <li>You can vote only once per election</li>
+                    <li>Your vote is anonymous and stored on the blockchain</li>
+                    <li>Your identity is represented by your wallet address only</li>
+                </ul>
+            </div>
+        </section>
 
-        <div class="options-grid">
-            <a href="/vote" class="option-card">
-                <img src="{{ url_for('static', filename='images/vote.png') }}" class="icon">
+        <section class="actions-grid">
+            <div class="action-card">
+                <div class="action-icon">🗳️</div>
                 <h3>Cast Your Vote</h3>
-                <p>Sign your vote with MetaMask and record it on blockchain.</p>
-            </a>
+                <p>Select your preferred candidates and submit your vote.</p>
+                <a href="/vote" class="cta-btn">Go to Voting</a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">📊</div>
+                <h3>View Live Results</h3>
+                <p>See real-time tallies fetched directly from the blockchain.</p>
+                <a href="/results" class="cta-btn secondary">View Results</a>
+            </div>
+        </section>
 
-            <a href="/results" class="option-card">
-                <img src="{{ url_for('static', filename='images/results.png') }}" class="icon">
-                <h3>View Results</h3>
-                <p>See live tally directly from the smart contract.</p>
-            </a>
-        </div>
+        <section class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step"><div class="step-icon">🔗</div><div class="step-text">Connect Wallet</div></div>
+                <div class="step"><div class="step-icon">✅</div><div class="step-text">Verify Identity</div></div>
+                <div class="step"><div class="step-icon">🗳️</div><div class="step-text">Cast Your Vote</div></div>
+                <div class="step"><div class="step-icon">📈</div><div class="step-text">View Results</div></div>
+            </div>
+        </section>
+
+        <section class="why-blockchain">
+            <h2>Why Blockchain?</h2>
+            <div class="features">
+                <div class="feature-card"><div class="feature-icon">🛡️</div><div class="feature-text">Tamper-Proof</div></div>
+                <div class="feature-card"><div class="feature-icon">🔍</div><div class="feature-text">Transparent</div></div>
+                <div class="feature-card"><div class="feature-icon">1️⃣</div><div class="feature-text">One Vote Per Wallet</div></div>
+                <div class="feature-card"><div class="feature-icon">🌐</div><div class="feature-text">Decentralized</div></div>
+            </div>
+        </section>
     </main>
 
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
+<script src="{{ url_for('static', filename='jss/dashboard.js') }}"></script>
 </body>
 </html>
