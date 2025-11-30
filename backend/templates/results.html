@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Election Results — Student Election</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<header class="navbar">
+    <span class="title">Student Election — Live Results (On-chain)</span>
+</header>
+
+<main class="container">
+    <section class="card">
+        <h2>Live Election Results</h2>
+        <p class="subtitle">Vote counts are fetched from the smart contract.</p>
+
+        <div class="results-grid">
+
+            <div class="result-card">
+                <img src="{{ url_for('static', filename='images/cand1.jpg') }}" class="cand-img">
+                <h3>Candidate One</h3>
+                <p class="position">Class Representative</p>
+                <p class="votes">
+                    Votes: <span id="cand1Votes" class="vote-num">...</span>
+                </p>
+            </div>
+
+            <div class="result-card">
+                <img src="{{ url_for('static', filename='images/cand2.jpg') }}" class="cand-img">
+                <h3>Candidate Two</h3>
+                <p class="position">Class Representative</p>
+                <p class="votes">
+                    Votes: <span id="cand2Votes" class="vote-num">...</span>
+                </p>
+            </div>
+
+            <div class="result-card">
+                <img src="{{ url_for('static', filename='images/cand3.jpg') }}" class="cand-img">
+                <h3>Candidate Three</h3>
+                <p class="position">Class Representative</p>
+                <p class="votes">
+                    Votes: <span id="cand3Votes" class="vote-num">...</span>
+                </p>
+            </div>
+
+        </div>
+
+        <div class="actions">
+            <a href="/dashboard" class="link-btn">Back</a>
+        </div>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/blockchainConfig.js') }}"></script>
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+
+</body>
+</html>

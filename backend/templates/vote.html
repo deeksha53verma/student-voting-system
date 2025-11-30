@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cast Vote — Student Election</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vote.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="nav-left">
+        <span class="title">Student Election — Cast Your Vote</span>
+    </div>
+    <div class="nav-right">
+        <span id="walletStatus">Wallet: Not Connected</span>
+        <button id="connectWalletBtn" class="secondary-btn">Connect MetaMask</button>
+    </div>
+</header>
+
+<main class="container">
+    <section class="card">
+        <h2>Select Your Candidate</h2>
+        <p class="subtitle">Your vote is signed by your wallet and stored on blockchain.</p>
+
+        <form id="voteForm">
+            <div class="candidates-grid">
+
+                {% for c in candidates %}
+                <label class="candidate-card">
+                    <input type="radio" name="candidate" value="{{ c.id }}">
+                    <div class="candidate-inner">
+                        <img src="{{ url_for('static', filename='images/' + c.image) }}" class="cand-img">
+                        <h3>{{ c.name }}</h3>
+                        <p class="position">{{ c.position }}</p>
+                        <p class="small">Tap to select</p>
+                    </div>
+                </label>
+                {% endfor %}
+
+                {% if not candidates %}
+                <p class="no-candidates">No candidates available.</p>
+                {% endif %}
+
+            </div>
+
+            <p id="status" class="message"></p>
+
+            <div class="actions">
+                <button type="button" id="submitVoteBtn" class="primary-btn">Cast Vote</button>
+                <a href="/dashboard" class="link-btn">Back</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<div id="voteAnimation" class="vote-animation hidden">
+    <div class="ballot-box">
+        <div class="slot"></div>
+        <div class="ballot"></div>
+    </div>
+    <p class="vote-text">Submitting your vote...</p>
+</div>
+
+<!-- ethers.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/blockchainConfig.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vote.js') }}"></script>
+    <!-- Ethers.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
+
+    <!-- Our blockchain config (address + ABI) -->
+    <script src="{{ url_for('static', filename='js/blockchainConfig.js') }}"></script>
+
+    <!-- Voting logic -->
+    <script src="{{ url_for('static', filename='js/vote.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+:root {
+    --primary: #1e3a8a;
+    --bg: #eef2ff;
+    --card-bg: #ffffff;
+    --radius: 16px;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    font-family: "Poppins", sans-serif;
+}
+
+.navbar {
+    background: var(--primary);
+    color: white;
+    padding: 16px 32px;
+    font-size: 1.2rem;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 16px;
+}
+
+.welcome-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.option-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    text-align: center;
+}
+
+.option-card .icon {
+    width: 60px;
+    margin-bottom: 10px;
+}

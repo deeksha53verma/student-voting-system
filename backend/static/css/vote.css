@@ -1,0 +1,98 @@
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: #f3f4ff;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: #1e3a8a;
+    color: #fff;
+}
+
+.container {
+    max-width: 960px;
+    margin: 30px auto;
+    padding: 0 16px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.candidate-card input {
+    display: none;
+}
+
+.candidate-inner {
+    border-radius: 14px;
+    border: 2px solid transparent;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.cand-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.candidate-card input:checked + .candidate-inner {
+    border-color: #1e3a8a;
+    background: #eff6ff;
+}
+
+.primary-btn,
+.secondary-btn,
+.link-btn {
+    border-radius: 999px;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.primary-btn {
+    background: #1e3a8a;
+    color: #fff;
+}
+
+.secondary-btn {
+    background: #fff;
+    color: #1e3a8a;
+}
+
+.link-btn {
+    background: transparent;
+    color: #1e3a8a;
+}
+
+.message {
+    margin-top: 12px;
+    min-height: 18px;
+    font-size: 0.9rem;
+}
+
+.message.error { color: #b91c1c; }
+.message.success { color: #15803d; }
+
+.vote-animation.hidden {
+    display: none;
+}

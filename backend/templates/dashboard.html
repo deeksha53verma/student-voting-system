@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Election — Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+
+    <div class="navbar">
+        Student Election — Dashboard
+    </div>
+
+    <main class="container">
+        <div class="welcome-card">
+            <h2>Blockchain-based Voting</h2>
+            <p>
+                This student election system uses Ethereum/Polygon smart contracts.
+                Votes are recorded on-chain, not in any local database.
+            </p>
+        </div>
+
+        <div class="options-grid">
+            <a href="/vote" class="option-card">
+                <img src="{{ url_for('static', filename='images/vote.png') }}" class="icon">
+                <h3>Cast Your Vote</h3>
+                <p>Sign your vote with MetaMask and record it on blockchain.</p>
+            </a>
+
+            <a href="/results" class="option-card">
+                <img src="{{ url_for('static', filename='images/results.png') }}" class="icon">
+                <h3>View Results</h3>
+                <p>See live tally directly from the smart contract.</p>
+            </a>
+        </div>
+    </main>
+
+</body>
+</html>

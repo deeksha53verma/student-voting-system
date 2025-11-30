@@ -1,0 +1,56 @@
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: #eef2ff;
+}
+
+.navbar {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 14px 24px;
+}
+
+.container {
+    max-width: 960px;
+    margin: 30px auto;
+    padding: 0 16px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.result-card {
+    text-align: center;
+    padding: 16px;
+}
+
+.cand-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.vote-num {
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.link-btn {
+    display: inline-block;
+    margin-top: 16px;
+    text-decoration: none;
+    color: #1e3a8a;
+}
