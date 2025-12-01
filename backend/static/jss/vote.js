@@ -37,26 +37,18 @@ function showStatus(message, type = "info") {
 
 function updateSelectedCandidate() {
     const selected = document.querySelector('input[name="candidate"]:checked');
-    if (!selected) {
-        selectedBox.classList.add("empty");
-        selectedBox.innerHTML = "<span>No candidate selected yet.</span>";
-        return;
-    }
-
+    if (!selected || !selectedBox) return;
     const card = selected.closest(".candidate-card").querySelector(".candidate-inner");
     const name = card.querySelector("h3").textContent;
     const position = card.querySelector(".position").textContent;
-
     selectedBox.classList.remove("empty");
-    selectedBox.innerHTML = `
-        <strong>${name}</strong><br>
-        <span style="font-size: 0.78rem; color: #9ca3af;">${position}</span>
-    `;
-    updateGasEstimate();
+    selectedBox.innerHTML = `<strong>${name}</strong><br><span style="font-size: 0.78rem; color: #9ca3af;">${position}</span>`;
+    if (gasFeeEl) updateGasEstimate();
 }
 
 async function updateGasEstimate() {
     try {
+        if (!gasFeeEl) return;
         if (!contract) {
             gasFeeEl.textContent = "—";
             return;
@@ -92,20 +84,22 @@ async function initEthersAndContract() {
             window.localStorage.setItem('localWalletId', userAccount);
         }
         walletStatus.textContent = "Wallet: " + formatWallet(userAccount);
-        walletAddressDisplay.textContent = formatWallet(userAccount);
+        if (walletAddressDisplay) walletAddressDisplay.textContent = formatWallet(userAccount);
         networkPill.textContent = "Network: LocalChain (no gas)";
         try {
             const res = await fetch(`/api/local/hasVoted?wallet=${userAccount}`);
             const data = await res.json();
-            if (data.hasVoted) {
-                voteStatusLabel.textContent = "Already voted";
-                voteStatusLabel.style.background = "rgba(34,197,94,0.18)";
-            } else {
-                voteStatusLabel.textContent = "Eligible to vote";
-                voteStatusLabel.style.background = "rgba(59,130,246,0.2)";
+            if (voteStatusLabel) {
+                if (data.hasVoted) {
+                    voteStatusLabel.textContent = "Already voted";
+                    voteStatusLabel.style.background = "rgba(34,197,94,0.18)";
+                } else {
+                    voteStatusLabel.textContent = "Eligible to vote";
+                    voteStatusLabel.style.background = "rgba(59,130,246,0.2)";
+                }
             }
         } catch {}
-        gasFeeEl.textContent = "0";
+        if (gasFeeEl) gasFeeEl.textContent = "0";
         return;
     }
 
@@ -115,7 +109,7 @@ async function initEthersAndContract() {
     userAccount = await signer.getAddress();
 
     walletStatus.textContent = "Wallet: " + formatWallet(userAccount);
-    walletAddressDisplay.textContent = formatWallet(userAccount);
+    if (walletAddressDisplay) walletAddressDisplay.textContent = formatWallet(userAccount);
 
     const chainId = Number(network.chainId);
     networkPill.textContent = `Network: ${network.name || 'Unknown'} (chainId: ${chainId})`;
@@ -134,15 +128,14 @@ async function initEthersAndContract() {
     }
 
     // If contract address is dummy, switch to LocalChain (gasless) mode
-    if (
-        !window.CONTRACT_ADDRESS ||
-        window.CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000"
-    ) {
+    if (!window.CONTRACT_ADDRESS || window.CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
         contract = null;
         networkPill.textContent = "Network: LocalChain (no gas)";
-        voteStatusLabel.textContent = "Eligible to vote";
-        voteStatusLabel.style.background = "rgba(59,130,246,0.2)";
-        gasFeeEl.textContent = "0";
+        if (voteStatusLabel) {
+            voteStatusLabel.textContent = "Eligible to vote";
+            voteStatusLabel.style.background = "rgba(59,130,246,0.2)";
+        }
+        if (gasFeeEl) gasFeeEl.textContent = "0";
         return;
     }
 
@@ -162,18 +155,20 @@ async function initEthersAndContract() {
         } else {
             already = await contract.hasVoted(userAccount);
         }
-        if (already) {
-            voteStatusLabel.textContent = "Already voted";
-            voteStatusLabel.style.background = "rgba(34,197,94,0.18)";
-        } else {
-            voteStatusLabel.textContent = "Eligible to vote";
-            voteStatusLabel.style.background = "rgba(59,130,246,0.2)";
+        if (voteStatusLabel) {
+            if (already) {
+                voteStatusLabel.textContent = "Already voted";
+                voteStatusLabel.style.background = "rgba(34,197,94,0.18)";
+            } else {
+                voteStatusLabel.textContent = "Eligible to vote";
+                voteStatusLabel.style.background = "rgba(59,130,246,0.2)";
+            }
         }
     } catch (err) {
         console.warn("Could not check hasVoted:", err);
-        voteStatusLabel.textContent = "Unable to check vote status";
+        if (voteStatusLabel) voteStatusLabel.textContent = "Unable to check vote status";
     }
-    await updateGasEstimate();
+    if (gasFeeEl) await updateGasEstimate();
 }
 
 // --------- Event: Candidate selection ----------
@@ -183,23 +178,27 @@ document.querySelectorAll('input[name="candidate"]').forEach(radio => {
 });
 
 // --------- Event: Save contract address override ----------
-saveContractBtn.addEventListener('click', () => {
-    const addr = (contractInput.value || '').trim();
-    if (!/^0x[a-fA-F0-9]{40}$/.test(addr)) {
-        showStatus("Invalid contract address.", "error");
-        return;
-    }
-    window.localStorage.setItem('contractAddressOverride', addr);
-    showStatus("Saved. Reloading...", "info");
-    setTimeout(() => window.location.reload(), 800);
-});
+if (saveContractBtn && contractInput) {
+    saveContractBtn.addEventListener('click', () => {
+        const addr = (contractInput.value || '').trim();
+        if (!/^0x[a-fA-F0-9]{40}$/.test(addr)) {
+            showStatus("Invalid contract address.", "error");
+            return;
+        }
+        window.localStorage.setItem('contractAddressOverride', addr);
+        showStatus("Saved. Reloading...", "info");
+        setTimeout(() => window.location.reload(), 800);
+    });
+}
 
 // --------- Event: Open Remix with contract code ----------
+if (openRemixBtn) {
 openRemixBtn.addEventListener('click', () => {
     const src = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract Election {\n    mapping(uint256 => uint256) public votes;\n    mapping(address => bool) public hasVoted;\n    event VoteSubmitted(address voter, uint256 candidateId);\n    function vote(uint256 candidateId) public {\n        require(!hasVoted[msg.sender], \"You already voted!\");\n        require(candidateId == 1 || candidateId == 2 || candidateId == 3, \"Invalid candidate\");\n        hasVoted[msg.sender] = true;\n        votes[candidateId] += 1;\n        emit VoteSubmitted(msg.sender, candidateId);\n    }\n    function getVotes(uint256 candidateId) public view returns (uint256) {\n        return votes[candidateId];\n    }\n}`;
     const url = `https://remix.ethereum.org/#language=Solidity&code=${encodeURIComponent(src)}`;
     window.open(url, '_blank');
 });
+}
 
 // --------- Event: Connect MetaMask ----------
 
@@ -261,11 +260,11 @@ submitVoteBtn.addEventListener("click", async () => {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Vote failed');
-            txHashEl.textContent = data.txHash;
-            txHashLink.style.display = 'none';
+            if (txHashEl) txHashEl.textContent = data.txHash;
+            if (txHashLink) txHashLink.style.display = 'none';
             animation.classList.add("hidden");
             showStatus("Vote recorded on LocalChain.", "success");
-            voteStatusLabel.textContent = "Already voted";
+            if (voteStatusLabel) voteStatusLabel.textContent = "Already voted";
             setTimeout(() => { window.location.href = "/dashboard"; }, 1500);
         } catch (err) {
             animation.classList.add("hidden");
@@ -289,8 +288,8 @@ submitVoteBtn.addEventListener("click", async () => {
 
         const tx = await contract.vote(candidateId);
         console.log("Transaction sent:", tx.hash);
-        txHashEl.textContent = tx.hash;
-        if (window.DEFAULT_CHAIN && window.DEFAULT_CHAIN.blockExplorerUrls && window.DEFAULT_CHAIN.blockExplorerUrls[0]) {
+        if (txHashEl) txHashEl.textContent = tx.hash;
+        if (txHashLink && window.DEFAULT_CHAIN && window.DEFAULT_CHAIN.blockExplorerUrls && window.DEFAULT_CHAIN.blockExplorerUrls[0]) {
             txHashLink.href = `${window.DEFAULT_CHAIN.blockExplorerUrls[0]}/tx/${tx.hash}`;
             txHashLink.style.display = 'inline-block';
         }
@@ -301,7 +300,7 @@ submitVoteBtn.addEventListener("click", async () => {
         animation.classList.add("hidden");
 
         showStatus("Vote successfully cast on blockchain!", "success");
-        voteStatusLabel.textContent = "Already voted";
+        if (voteStatusLabel) voteStatusLabel.textContent = "Already voted";
 
         setTimeout(() => {
             window.location.href = "/dashboard";
