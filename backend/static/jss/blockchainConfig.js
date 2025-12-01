@@ -2,9 +2,14 @@
 
 // Contract address. Can be overridden via localStorage key 'contractAddressOverride'.
 let CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
-const override = (typeof window !== 'undefined') ? window.localStorage.getItem('contractAddressOverride') : null;
-if (override && /^0x[a-fA-F0-9]{40}$/.test(override)) {
-  CONTRACT_ADDRESS = override;
+const serverAddr = (typeof window !== 'undefined') ? window.SERVER_CONTRACT_ADDRESS : null;
+if (serverAddr && /^0x[a-fA-F0-9]{40}$/.test(serverAddr)) {
+  CONTRACT_ADDRESS = serverAddr;
+} else {
+  const override = (typeof window !== 'undefined') ? window.localStorage.getItem('contractAddressOverride') : null;
+  if (override && /^0x[a-fA-F0-9]{40}$/.test(override)) {
+    CONTRACT_ADDRESS = override;
+  }
 }
 
 // Default chain config (Sepolia). Used for optional chain switching.
