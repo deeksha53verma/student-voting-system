@@ -10,7 +10,9 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     async function fetchCounts() {
         if (!window.CONTRACT_ADDRESS || window.CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-            throw new Error('Contract not configured');
+            const res = await fetch('/api/local/results');
+            const data = await res.json();
+            return [Number(data["1"]), Number(data["2"]), Number(data["3"])];
         }
         const rpc = (window.DEFAULT_CHAIN && window.DEFAULT_CHAIN.rpcUrls && window.DEFAULT_CHAIN.rpcUrls[0]) || undefined;
         const provider = rpc ? new ethers.JsonRpcProvider(rpc) : new ethers.JsonRpcProvider();
