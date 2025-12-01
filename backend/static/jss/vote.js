@@ -75,33 +75,7 @@ async function updateGasEstimate() {
 }
 
 async function initEthersAndContract() {
-    if (!window.ethereum) {
-        const existing = window.localStorage.getItem('localWalletId');
-        if (existing) {
-            userAccount = existing;
-        } else {
-            userAccount = 'LCW-' + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2);
-            window.localStorage.setItem('localWalletId', userAccount);
-        }
-        walletStatus.textContent = "Wallet: " + formatWallet(userAccount);
-        if (walletAddressDisplay) walletAddressDisplay.textContent = formatWallet(userAccount);
-        networkPill.textContent = "Network: LocalChain (no gas)";
-        try {
-            const res = await fetch(`/api/local/hasVoted?wallet=${userAccount}`);
-            const data = await res.json();
-            if (voteStatusLabel) {
-                if (data.hasVoted) {
-                    voteStatusLabel.textContent = "Already voted";
-                    voteStatusLabel.style.background = "rgba(34,197,94,0.18)";
-                } else {
-                    voteStatusLabel.textContent = "Eligible to vote";
-                    voteStatusLabel.style.background = "rgba(59,130,246,0.2)";
-                }
-            }
-        } catch {}
-        if (gasFeeEl) gasFeeEl.textContent = "0";
-        return;
-    }
+    if (!window.ethereum) { return; }
 
     provider = new ethers.BrowserProvider(window.ethereum);
     const network = await provider.getNetwork();
@@ -127,15 +101,9 @@ async function initEthersAndContract() {
         }
     }
 
-    // If contract address is dummy, switch to LocalChain (gasless) mode
     if (!window.CONTRACT_ADDRESS || window.CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
         contract = null;
-        networkPill.textContent = "Network: LocalChain (no gas)";
-        if (voteStatusLabel) {
-            voteStatusLabel.textContent = "Eligible to vote";
-            voteStatusLabel.style.background = "rgba(59,130,246,0.2)";
-        }
-        if (gasFeeEl) gasFeeEl.textContent = "0";
+        showStatus("Contract not configured.", "error");
         return;
     }
 
@@ -147,14 +115,7 @@ async function initEthersAndContract() {
 
     // Try to see if this address already voted
     try {
-        let already = false;
-        if (!contract) {
-            const res = await fetch(`/api/local/hasVoted?wallet=${userAccount}`);
-            const data = await res.json();
-            already = !!data.hasVoted;
-        } else {
-            already = await contract.hasVoted(userAccount);
-        }
+        const already = await contract.hasVoted(userAccount);
         if (voteStatusLabel) {
             if (already) {
                 voteStatusLabel.textContent = "Already voted";
@@ -205,13 +166,7 @@ openRemixBtn.addEventListener('click', () => {
 connectBtn.addEventListener("click", async () => {
     showStatus("", "info");
 
-    if (!window.ethereum) {
-        await initEthersAndContract();
-        connectBtn.textContent = "Connected";
-        connectBtn.disabled = true;
-        showStatus("Wallet connected!", "success");
-        return;
-    }
+    if (!window.ethereum) { showStatus("MetaMask is not installed.", "error"); return; }
 
     try {
         await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -243,35 +198,7 @@ submitVoteBtn.addEventListener("click", async () => {
         return;
     }
 
-    if (!contract) {
-        const selected = document.querySelector('input[name="candidate"]:checked');
-        if (!selected) {
-            showStatus("Please select a candidate!", "error");
-            return;
-        }
-        const candidateId = parseInt(selected.value, 10);
-        try {
-            animation.classList.remove("hidden");
-            showStatus("Submitting vote to LocalChain...", "info");
-            const res = await fetch('/api/local/vote', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ candidateId, wallet: userAccount })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Vote failed');
-            if (txHashEl) txHashEl.textContent = data.txHash;
-            if (txHashLink) txHashLink.style.display = 'none';
-            animation.classList.add("hidden");
-            showStatus("Vote recorded on LocalChain.", "success");
-            if (voteStatusLabel) voteStatusLabel.textContent = "Already voted";
-            setTimeout(() => { window.location.href = "/dashboard"; }, 1500);
-        } catch (err) {
-            animation.classList.add("hidden");
-            showStatus(err.message || "Failed to cast vote.", "error");
-        }
-        return;
-    }
+    if (!contract) { showStatus("Contract not configured.", "error"); return; }
 
     const selected = document.querySelector('input[name="candidate"]:checked');
     if (!selected) {
@@ -316,9 +243,7 @@ submitVoteBtn.addEventListener("click", async () => {
 async function fetchCounts() {
     try {
         if (!window.CONTRACT_ADDRESS || window.CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-            const res = await fetch('/api/local/results');
-            const data = await res.json();
-            return [Number(data["1"]), Number(data["2"]), Number(data["3"])];
+            throw new Error('Contract not configured');
         }
         const rpc = (window.DEFAULT_CHAIN && window.DEFAULT_CHAIN.rpcUrls && window.DEFAULT_CHAIN.rpcUrls[0]) || undefined;
         const provider = rpc ? new ethers.JsonRpcProvider(rpc) : new ethers.JsonRpcProvider();

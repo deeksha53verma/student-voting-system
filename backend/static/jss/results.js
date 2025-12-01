@@ -6,14 +6,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     const c2El = document.getElementById("cand2Votes");
     const c3El = document.getElementById("cand3Votes");
     const chartEl = document.getElementById("resultsChart");
-    const downloadBtn = document.getElementById("downloadCsvBtn");
     let chart = null;
 
     async function fetchCounts() {
         if (!window.CONTRACT_ADDRESS || window.CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-            const res = await fetch('/api/local/results');
-            const data = await res.json();
-            return [Number(data["1"]), Number(data["2"]), Number(data["3"])];
+            throw new Error('Contract not configured');
         }
         const rpc = (window.DEFAULT_CHAIN && window.DEFAULT_CHAIN.rpcUrls && window.DEFAULT_CHAIN.rpcUrls[0]) || undefined;
         const provider = rpc ? new ethers.JsonRpcProvider(rpc) : new ethers.JsonRpcProvider();
@@ -69,21 +66,4 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     await render();
     setInterval(render, 5000);
-
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const res = await fetch('/api/local/export.csv');
-            const text = await res.text();
-            const blob = new Blob([text], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'results.csv';
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-        });
-    }
 });
